@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TemplateHub - Premium Templates Marketplace</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#10B981',
+                        dark: '#1F2937',
+                        light: '#F9FAFB'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .template-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .template-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        .preview-modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+        .preview-content {
+            margin: 5% auto;
+            width: 80%;
+            max-width: 1200px;
+        }
+        .close-preview {
+            color: #fff;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .editor-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            z-index: 1000;
+        }
+        .language-selector {
+            display: none;
+            position: absolute;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 1rem;
+            z-index: 10;
+        }
+        .dark-mode .language-selector {
+            background: #374151;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+    <!-- Navigation -->
+    <nav class="bg-white dark:bg-gray-800 shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <h1 class="text-2xl font-bold text-primary dark:text-white">TemplateHub</h1>
+                    </div>
+                    <div class="hidden md:ml-6 md:flex md:space-x-8">
+                        <a href="#" class="text-gray-900 dark:text-white hover:text-primary px-3 py-2 text-sm font-medium">Home</a>
+                        <a href="#categories" class="text-gray-900 dark:text-white hover:text-primary px-3 py-2 text-sm font-medium">Categories</a>
+                        <a href="#templates" class="text-gray-900 dark:text-white hover:text-primary px-3 py-2 text-sm font-medium">Templates</a>
+                        <a href="#pricing" class="text-gray-900 dark:text-white hover:text-primary px-3 py-2 text-sm font-medium">Pricing</a>
+                        <a href="#blog" class="text-gray-900 dark:text-white hover:text-primary px-3 py-2 text-sm font-medium">Blog</a>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="relative">
+                        <button onclick="toggleLanguageSelector()" class="text-gray-700 dark:text-gray-300 hover:text-primary">
+                            <i class="fas fa-globe text-lg"></i>
+                        </button>
+                        <div id="languageSelector" class="language-selector">
+                            <div class="space-y-2">
+                                <button onclick="changeLanguage('en')" class="block w-full text-left px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-600">English</button>
+                                <button onclick="changeLanguage('hi')" class="block w-full text-left px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-600">Hindi</button>
+                                <button onclick="changeLanguage('ta')" class="block w-full text-left px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-600">Tamil</button>
+                            </div>
+                        </div>
+                    </div>
+                    <button id="darkModeToggle" class="text-gray-700 dark:text-gray-300 hover:text-primary">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    <div class="relative">
+                        <input type="text" placeholder="Search templates..." class="px-4 py-2 border rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-700 dark:text-white dark:border-gray-600">
+                        <button class="absolute right-3 top-2 text-gray-400">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                    <button onclick="toggleLogin()" class="bg-primary text-white px-4 py-2 rounded-full text-sm hover:bg-blue-600">Login</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="bg-gradient-to-r from-blue-600 to-purple-600 dark:from-gray-800 dark:to-gray-900 text-white py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-5xl font-bold mb-6">Find Perfect Templates for Every Need</h1>
+            <p class="text-xl mb-8">10,000+ professional templates for resumes, business documents, designs, and more</p>
+            <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+                <button class="bg-white text-primary px-8 py-3 rounded-full font-semibold hover:bg-gray-100">Explore Templates</button>
+                <button class="border-2 border-white text-white px-8 py-3 rounded-full font-semibold hover:bg-white hover:text-primary">Try AI Builder</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Categories Section -->
+    <section id="categories" class="py-16 bg-white dark:bg-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold text-center mb-12 text-gray-900 dark:text-white">Browse by Category</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div class="category-card bg-gray-50 dark:bg-gray-700 p-6 rounded-lg text-center cursor-pointer hover:shadow-lg transition-shadow">
+                    <div class="w-16 h-16 bg-blue-100 dark:bg-blue-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-file-alt text-2xl text-blue-600 dark:text-blue-300"></i>
+                    </div>
+                    <h3 class="font-semibold text-gray-900 dark:text-white">Resumes & CV</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-300">2,500+ templates</p>
+                </div>
+                <div class="category-card bg-gray-50 dark:bg-gray-700 p-6 rounded-lg text-center cursor-pointer hover:shadow-lg transition-shadow">
+                    <div class="w-16 h-16 bg-green-100 dark:bg-green-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-briefcase text-2xl text-green-600 dark:text-green-300"></i>
+                    </div>
+                    <h3 class="font-semibold text-gray-900 dark:text-white">Business</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-300">1,800+ templates</p>
+                </div>
+                <div class="category-card bg-gray-50 dark:bg-gray-700 p-6 rounded-lg text-center cursor-pointer hover:shadow-lg transition-shadow">
+                    <div class="w-16 h-16 bg-purple-100 dark:bg-purple-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-paint-brush text-2xl text-purple-600 dark:text-purple-300"></i>
+                    </div>
+                    <h3 class="font-semibold text-gray-900 dark:text-white">Design</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-300">3,200+ templates</p>
+                </div>
+                <div class="category-card bg-gray-50 dark:bg-gray-700 p-6 rounded-lg text-center cursor-pointer hover:shadow-lg transition-shadow">
+                    <div class="w-16 h-16 bg-orange-100 dark:bg-orange-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-graduation-cap text-2xl text-orange-600 dark:text-orange-300"></i>
+                    </div>
+                    <h3 class="font-semibold text-gray-900 dark:text-white">Education</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-300">1,500+ templates</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Templates Section -->
+    <section id="templates" class="py-16 bg-gray-50 dark:bg-gray-900">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-3xl font-bold text-gray-900 dark:text-white">Featured Templates</h2>
+                <div class="flex space-x-4">
+                    <select class="px-4 py-2 border rounded-lg dark:bg-gray-700 dark:text-white dark:border-gray-600">
+                        <option>All Categories</option>
+                        <option>Resumes</option>
+                        <option>Business</option>
+                        <option>Design</option>
+                        <option>Education</option>
+                    </select>
+                    <select class="px-4 py-2 border rounded-lg dark:bg-gray-700 dark:text-white dark:border-gray-600">
+                        <option>Popular</option>
+                        <option>Newest</option>
+                        <option>Price: Low to High</option>
+                        <option>Price: High to Low</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                <!-- Template 1 -->
+                <div class="template-card bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-md">
+                    <div class="relative">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/5f68edd3-c493-4987-8fcd-8201b5ab5109.png" alt="Modern professional resume template with blue accents and clean typography for IT professionals" class="w-full h-48 object-cover">
+                        <div class="absolute top-2 right-2 bg-primary text-white px-2 py-1 rounded text-xs">Premium</div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-semibold text-lg text-gray-900 dark:text-white">Modern IT Resume</h3>
+                        <p class="text-gray-600 dark:text-gray-300 text-sm mb-3">Perfect for software developers and IT professionals</p>
+                        <div class="flex justify-between items-center mb-3">
+                            <div class="flex items-center">
+                                <div class="flex text-yellow-400">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star-half-alt"></i>
+                                </div>
+                                <span class="text-sm text-gray-600 dark:text-gray-300 ml-2">4.5 (128)</span>
+                            </div>
+                            <span class="text-primary font-bold">$12.99</span>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button onclick="openPreview('template1')" class="flex-1 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white py-2 rounded text-sm hover:bg-gray-300 dark:hover:bg-gray-600">Preview</button>
+                            <button onclick="openEditor('template1')" class="flex-1 bg-primary text-white py-2 rounded text-sm hover:bg-blue-600">Edit Online</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Template 2 -->
+                <div class="template-card bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-md">
+                    <div class="relative">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/5a501f1e-0953-406e-ad5f-9a288942f360.png" alt="Elegant business proposal template with corporate branding and professional layout" class="w-full h-48 object-cover">
+                        <div class="absolute top-2 right-2 bg-green-500 text-white px-2 py-1 rounded text-xs">Free</div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-semibold text-lg text-gray-900 dark:text-white">Business Proposal</h3>
+                        <p class="text-gray-600 dark:text-gray-300 text-sm mb-3">Professional template for corporate proposals</p>
+                        <div class="flex justify-between items-center mb-3">
+                            <div class="flex items-center">
+                                <div class="flex text-yellow-400">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="far fa-star"></i>
+                                </div>
+                                <span class="text-sm text-gray-600 dark:text-gray-300 ml-2">4.0 (89)</span>
+                            </div>
+                            <span class="text-green-500 font-bold">Free</span>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button onclick="openPreview('template2')" class="flex-1 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white py-2 rounded text-sm hover:bg-gray-300 dark:hover:bg-gray-600">Preview</button>
+                            <button onclick="downloadTemplate('template2')" class="flex-1 bg-green-500 text-white py-2 rounded text-sm hover:bg-green-600">Download</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Template 3 -->
+                <div class="template-card bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-md">
+                    <div class="relative">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/9c50c36d-fdfb-48dc-925a-c7d37fc60e8f.png" alt="Social media post template with vibrant colors and modern design elements for Instagram" class="w-full h-48 object-cover">
+                        <div class="absolute top-2 right-2 bg-primary text-white px-2 py-1 rounded text-xs">Premium</div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-semibold text-lg text-gray-900 dark:text-white">Social Media Pack</h3>
+                        <p class="text-gray-600 dark:text-gray-300 text-sm mb-3">10 templates for Instagram, Facebook, Twitter</p>
+                        <div class="flex justify-between items-center mb-3">
+                            <div class="flex items-center">
+                                <div class="flex text-yellow-400">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                </div>
+                                <span class="text-sm text-gray-600 dark:text-gray-300 ml-2">4.8 (256)</span>
+                            </div>
+                            <span class="text-primary font-bold">$24.99</span>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button onclick="openPreview('template3')" class="flex-1 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white py-2 rounded text-sm hover:bg-gray-300 dark:hover:bg-gray-600">Preview</button>
+                            <button onclick="openEditor('template3')" class="flex-1 bg-primary text-white py-2 rounded text-sm hover:bg-blue-600">Edit Online</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Template 4 -->
+                <div class="template-card bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-md">
+                    <div class="relative">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/5192fb3a-292c-47da-97bc-d45c6fc6166b.png" alt="Academic research paper template with formal formatting and citation guidelines" class="w-full h-48 object-cover">
+                        <div class="absolute top-2 right-2 bg-primary text-white px-2 py-1 rounded text-xs">Premium</div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-semibold text-lg text-gray-900 dark:text-white">Research Paper</h3>
+                        <p class="text-gray-600 dark:text-gray-300 text-sm mb-3">Academic template with APA/MLA formatting</p>
+                        <div class="flex justify-between items-center mb-3">
+                            <div class="flex items-center">
+                                <div class="flex text-yellow-400">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star-half-alt"></i>
+                                </div>
+                                <span class="text-sm text-gray-600 dark:text-gray-300 ml-2">4.3 (167)</span>
+                            </div>
+                            <span class="text-primary font-bold">$9.99</span>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button onclick="openPreview('template4')" class="flex-1 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white py-2 rounded text-sm hover:bg-gray-300 dark:hover:bg-gray-600">Preview</button>
+                            <button onclick="openEditor('template4')" class="flex-1 bg-primary text-white py-2 rounded text-sm hover:bg-blue-600">Edit Online</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- AI Builder Section -->
+    <section class="py-16 bg-white dark:bg-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">AI-Powered Template Builder</h2>
+                <p class="text-xl text-gray-600 dark:text-gray-300">Let AI create the perfect template for your needs</p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div>
+                    <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/24e02d09-621a-4e6e-9ac5-c18fd1e69ed8.png" alt="AI template builder interface showing real-time customization options and preview" class="rounded-lg shadow-lg">
+                </div>
+                <div>
+                    <div class="space-y-6">
+                        <div class="flex items-start">
+                            <div class="bg-primary rounded-full p-3 mr-4">
+                                <i class="fas fa-robot text-white text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-lg text-gray-900 dark:text-white mb-2">Smart Suggestions</h3>
+                                <p class="text-gray-600 dark:text-gray-300">AI analyzes your needs and recommends the best templates</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="bg-primary rounded-full p-3 mr-4">
+                                <i class="fas fa-magic text-white text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-lg text-gray-900 dark:text-white mb-2">Auto-Fill Content</h3>
+                                <p class="text-gray-600 dark:text-gray-300">Automatically populate templates with your information</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="bg-primary rounded-full p-3 mr-4">
+                                <i class="fas fa-sync-alt text-white text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-lg text-gray-900 dark:text-white mb-2">One-Click Export</h3>
+                                <p class="text-gray-600 dark:text-gray-300">Export to Word, PDF, Google Docs, and more with a single click</p>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="mt-8 bg-primary text-white px-8 py-3 rounded-full font-semibold hover:bg-blue-600">Try AI Builder Now</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="py-16 bg-gray-50 dark:bg-gray-900">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">Choose Your Plan</h2>
+                <p class="text-xl text-gray-600 dark:text-gray-300">Flexible pricing for individuals and teams</p>
+            </div>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
+                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">Free</h3>
+                    <div class="text-4xl font-bold text-gray-900 dark:text-white mb-6">$0</div>
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-center text-gray-600 dark:text-gray-300">
+                            <i class="fas fa-check text-green-500 mr-2"></i> 5 free templates per month
+                        </li>
+                        <li class="flex items-center text-gray-600 dark:text-gray-300">
+                            <i class="fas fa-check text-green-500 mr-2"></i> Basic online editor
+                        </li>
+                        <li class="flex items-center text-gray-400">
+                            <i class="fas fa-times text-red-500 mr-2"></i> Premium templates
+                        </li>
+                        <li class="flex items-center text-gray-400">
+                            <i class="fas fa-times text-red-500 mr-2"></i> AI features
+                        </li>
+                    </ul>
+                    <button class="w-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white py-3 rounded-lg font-semibold">Get Started</button>
+                </div>
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 border-2 border-primary relative">
+                    <div class="absolute top-0 right-0 bg-primary text-white px-4 py-1 rounded-bl-lg">Popular</div>
+                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">Pro</h3>
+                    <div class="text-4xl font-bold text-gray-900 dark:text-white mb-6">$12.99<span class="text-lg font-normal">/mo</span></div>
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-center text-gray-600 dark:text-gray-300">
+                            <i class="fas fa-check text-green-500 mr-2"></i> Unlimited templates
+                        </li>
+                        <li class="flex items-center text-gray-600 dark:text-gray-300">
+                            <i class="fas fa-check text-green-500 mr-2"></i> Advanced online editor
+                        </li>
+                        <li class="flex items-center text-gray-600 dark:text-gray-300">
+                            <i class="fas fa-check text-green-500 mr-2"></i> All premium templates
+                        </li>
+                        <li class="flex items-center text-gray-600 dark:text-gray-300">
+                            <i class="fas fa-check text-green-500 mr-2"></i> Basic AI features
+                        </li>
+                    </ul>
+                    <button class="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-blue-600">Subscribe Now</button>
+                </div>
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
+                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">Enterprise</h3>
+                    <div class="text-4xl font-bold text-gray-900 dark:text-white mb-6">$29.99<span class="text-lg font-normal">/mo</span></div>
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-center text-gray-600 dark:text-gray-300">
+                            <i class="fas fa-check text-green-500 mr-2"></i> Everything in Pro
+                        </li>
+                        <li class="flex items-center text-gray-600 dark:text-gray-300">
+                            <i class="fas fa-check text-green-500 mr-2"></i> Team collaboration
+                        </li>
+                        <li class="flex items-center text-gray-600 dark:text-gray-300">
+                            <i class="fas fa-check text-green-500 mr-2"></i> Advanced AI features
+                        </li>
+                        <li class="flex items-center text-gray-600 dark:text-gray-300">
+                            <i class="fas fa-check text-green-500 mr-2"></i> Priority support
+                        </li>
+                    </ul>
+                    <button class="w-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white py-3 rounded-lg font-semibold">Contact Sales</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Blog Section -->
+    <section id="blog" class="py-16 bg-white dark:bg-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">From Our Blog</h2>
+                <p class="text-xl text-gray-600 dark:text-gray-300">Tips, trends, and template insights</p>
+            </div>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-gray-50 dark:bg-gray-700 rounded-lg overflow-hidden">
+                    <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/b2abfbc6-bd6c-4fd9-a64f-410d433565ee.png" alt="Best resume templates for 2025 showing modern design trends and professional layouts" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-900 dark:text-white mb-3">Best Resume Templates for 2025</h3>
+                        <p class="text-gray-600 dark:text-gray-300 mb-4">Discover the top resume templates that will help you stand out in the competitive job market...</p>
+                        <a href="#" class="text-primary hover:underline">Read more →</a>
+                    </div>
+                </div>
+                <div class="bg-gray-50 dark:bg-gray-700 rounded-lg overflow-hidden">
+                    <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/0922e27d-c340-4654-8aeb-d98be709d556.png" alt="Business document design trends featuring modern corporate templates and professional layouts" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-900 dark:text-white mb-3">Business Document Design Trends</h3>
+                        <p class="text-gray-600 dark:text-gray-300 mb-4">Learn about the latest trends in business document design and how to make your proposals stand out...</p>
+                        <a href="#" class="text-primary hover:underline">Read more →</a>
+                    </div>
+                </div>
+                <div class="bg-gray-50 dark:bg-gray-700 rounded-lg overflow-hidden">
+                    <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/b800a727-38de-4ead-ae09-a107f8eb4e90.png" alt="AI-powered template creation tools showing automated design and content generation features" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg text-gray-900 dark:text-white mb-3">How AI is Revolutionizing Templates</h3>
+                        <p class="text-gray-600 dark:text-gray-300 mb-4">Explore how artificial intelligence is changing the way we create and use templates for various purposes...</p>
+                        <a href="#" class="text-primary hover:underline">Read more →</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 dark:bg-gray-900 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4">TemplateHub</h3>
+                    <p class="text-gray-400">Your one-stop destination for professional templates across all categories.</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Categories</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white">Resumes & CV</a></li>
+                        <li><a href="#" class="hover:text-white">Business Documents</a></li>
+                        <li><a href="#" class="hover:text-white">Design Templates</a></li>
+                        <li><a href="#" class="hover:text-white">Educational</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Company</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white">About Us</a></li>
+                        <li><a href="#" class="hover:text-white">Contact</a></li>
+                        <li><a href="#" class="hover:text-white">Careers</a></li>
+                        <li><a href="#" class="hover:text-white">Blog</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Connect</h4>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                    <div class="mt-4">
+                        <p class="text-gray-400">Subscribe to our newsletter</p>
+                        <div class="flex mt-2">
+                            <input type="email" placeholder="Your email" class="px-3 py-2 bg-gray-700 text-white rounded-l focus:outline-none">
+                            <button class="bg-primary px-4 py-2 rounded-r hover:bg-blue-600">Subscribe</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+                <p>© 2024 TemplateHub. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Preview Modal -->
+    <div id="previewModal" class="preview-modal">
+        <div class="preview-content">
+            <span class="close-preview" onclick="closePreview()">&times;</span>
+            <img id="previewImage" src="" alt="Template preview" class="w-full rounded-lg" src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/097b600b-ecc8-4ddc-9748-1d96e8a97de9.png">
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white dark:bg-gray-800 rounded-lg p-8 w-96">
+            <h2 class="text-2xl font-bold mb-6 text-gray-900 dark:text-white">Login to TemplateHub</h2>
+            <form>
+                <div class="mb-4">
+                    <label class="block text-gray-700 dark:text-gray-300 mb-2">Email</label>
+                    <input type="email" class="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:text-white dark:border-gray-600">
+                </div>
+                <div class="mb-6">
+                    <label class="block text-gray-700 dark:text-gray-300 mb-2">Password</label>
+                    <input type="password" class="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:text-white dark:border-gray-600">
+                </div>
+                <button type="button" class="w-full bg-primary text-white py-2 rounded-lg hover:bg-blue-600">Login</button>
+                <p class="text-center mt-4 text-gray-600 dark:text-gray-300">
+                    Don't have an account? <a href="#" class="text-primary hover:underline">Sign up</a>
+                </p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Online Editor -->
+    <div id="editor" class="editor-container">
+        <div class="h-16 bg-gray-800 text-white flex items-center justify-between px-6">
+            <h3 class="text-xl font-semibold">Online Template Editor</h3>
+            <button onclick="closeEditor()" class="text-white hover:text-gray-300">
+                <i class="fas fa-times text-2xl"></i>
+            </button>
+        </div>
+        <div class="flex h-[calc(100vh-4rem)]">
+            <div class="w-64 bg-gray-100 dark:bg-gray-700 p-4">
+                <h4 class="font-semibold mb-4 text-gray-800 dark:text-white">Elements</h4>
+                <ul class="space-y-2">
+                    <li><button class="w-full text-left px-2 py-1 rounded hover:bg-primary hover:text-white dark:hover:bg-primary">Text</button></li>
+                    <li><button class="w-full text-left px-2 py-1 rounded hover:bg-primary hover:text-white dark:hover:bg-primary">Image</button></li>
+                    <li><button class="w-full text-left px-2 py-1 rounded hover:bg-primary hover:text-white dark:hover:bg-primary">Shape</button></li>
+                    <li><button class="w-full text-left px-2 py-1 rounded hover:bg-primary hover:text-white dark:hover:bg-primary">Table</button></li>
+                </ul>
+            </div>
+            <div class="flex-1 bg-white dark:bg-gray-900 flex flex-col items-center justify-center">
+                <div class="w-full max-w-2xl bg-gray-50 dark:bg-gray-800 rounded-lg shadow-lg p-8 my-8">
+                    <h4 class="text-lg font-semibold mb-4 text-gray-800 dark:text-white">Edit Your Template</h4>
+                    <textarea class="w-full h-64 p-4 rounded border dark:bg-gray-700 dark:text-white dark:border-gray-600" placeholder="Start editing your template here..."></textarea>
+                    <div class="flex justify-end mt-4 space-x-2">
+                        <button class="bg-primary text-white px-4 py-2 rounded hover:bg-blue-600">Save</button>
+                        <button onclick="closeEditor()" class="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white px-4 py-2 rounded hover:bg-gray-300 dark:hover:bg-gray-600">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Language Selector Script -->
+    <script>
+        function toggleLanguageSelector() {
+            const selector = document.getElementById('languageSelector');
+            selector.style.display = selector.style.display === 'block' ? 'none' : 'block';
+        }
+        function changeLanguage(lang) {
+            alert('Language changed to: ' + lang);
+            document.getElementById('languageSelector').style.display = 'none';
+        }
+        // Dark mode toggle
+        document.getElementById('darkModeToggle').addEventListener('click', function () {
+            document.body.classList.toggle('dark');
+        });
+        // Login modal
+        function toggleLogin() {
+            document.getElementById('loginModal').classList.toggle('hidden');
+        }
+        // Preview modal
+        function openPreview(templateId) {
+            let imgSrc = '';
+            switch (templateId) {
+                case 'template1':
+                    imgSrc = 'https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/5f68edd3-c493-4987-8fcd-8201b5ab5109.png';
+                    break;
+                case 'template2':
+                    imgSrc = 'https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/5a501f1e-0953-406e-ad5f-9a288942f360.png';
+                    break;
+                case 'template3':
+                    imgSrc = 'https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/9c50c36d-fdfb-48dc-925a-c7d37fc60e8f.png';
+                    break;
+                case 'template4':
+                    imgSrc = 'https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/5192fb3a-292c-47da-97bc-d45c6fc6166b.png';
+                    break;
+                default:
+                    imgSrc = '';
+            }
+            document.getElementById('previewImage').src = imgSrc;
+            document.getElementById('previewModal').style.display = 'block';
+        }
+        function closePreview() {
+            document.getElementById('previewModal').style.display = 'none';
+        }
+        // Editor modal
+        function openEditor(templateId) {
+            document.getElementById('editor').style.display = 'block';
+        }
+        function closeEditor() {
+            document.getElementById('editor').style.display = 'none';
+        }
+        // Download template (simulated)
+        function downloadTemplate(templateId) {
+            alert('Download started for ' + templateId);
+        }
+        // Hide language selector on outside click
+        document.addEventListener('click', function (e) {
+            const selector = document.getElementById('languageSelector');
+            if (selector && !selector.contains(e.target) && !e.target.closest('button[onclick^="toggleLanguageSelector"]')) {
+                selector.style.display = 'none';
+            }
+        });
+    </script>
+
+    <!-- Professional JavaScript enhancements -->
+
+    <!-- 1. Animate hero section text on load -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const hero = document.querySelector('section.bg-gradient-to-r');
+            if (hero) {
+                hero.style.opacity = 0;
+                hero.style.transform = 'translateY(40px)';
+                setTimeout(() => {
+                    hero.style.transition = 'opacity 1s, transform 1s';
+                    hero.style.opacity = 1;
+                    hero.style.transform = 'translateY(0)';
+                }, 200);
+            }
+        });
+    </script>
+
+    <!-- 2. Fade-in effect for sections on scroll -->
+    <script>
+        function fadeInOnScroll() {
+            document.querySelectorAll('section, .template-card, .category-card').forEach(el => {
+                const rect = el.getBoundingClientRect();
+                if (rect.top < window.innerHeight - 60) {
+                    el.style.transition = 'opacity 1s, transform 1s';
+                    el.style.opacity = 1;
+                    el.style.transform = 'translateY(0)';
+                } else {
+                    el.style.opacity = 0;
+                    el.style.transform = 'translateY(40px)';
+                }
+            });
+        }
+        window.addEventListener('scroll', fadeInOnScroll);
+        window.addEventListener('DOMContentLoaded', fadeInOnScroll);
+    </script>
+
+    <!-- 3. Add ripple effect to all main buttons -->
+    <script>
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('click', function (e) {
+                const circle = document.createElement('span');
+                circle.className = 'ripple';
+                circle.style.left = `${e.offsetX}px`;
+                circle.style.top = `${e.offsetY}px`;
+                this.appendChild(circle);
+                setTimeout(() => circle.remove(), 600);
+            });
+        });
+    </script>
+
+    <!-- 4. Ripple effect CSS -->
+    <style>
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(59,130,246,0.3);
+            animation: ripple 0.6s linear;
+            pointer-events: none;
+            width: 100px;
+            height: 100px;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+        }
+        @keyframes ripple {
+            from { opacity: 1; transform: scale(0); }
+            to { opacity: 0; transform: scale(2); }
+        }
+        button { position: relative; overflow: hidden; }
+    </style>
+
+    <!-- 5. Smooth scroll for anchor links -->
+    <script>
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    e.preventDefault();
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+    </script>
+
+    <!-- 6. Show/hide navbar shadow on scroll -->
+    <script>
+        const nav = document.querySelector('nav');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 20) {
+                nav.classList.add('shadow-xl');
+            } else {
+                nav.classList.remove('shadow-xl');
+            }
+        });
+    </script>
+</body>
+</html>
